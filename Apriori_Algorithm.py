@@ -29,12 +29,22 @@ datasets = {
 dataset = 0
 attempted = 0
 
+
 def read_dataset_input():
-  global attempted, dataset
-  print("Invalid selection. Try again. \n") if attempted > 0 else print("Select a dataset: \n")
-  attempted += 1
-  dataset = input(" 1. Amazon \n 2. Best Buy \n 3. K-mart \n 4. Nike \n 5. Custom \n 6. Generic \n")
-  if dataset in datasets.keys(): print("You selected: ", datasets[dataset])
+    """
+      - On the first attempt, prompts the user to select a dataset.
+      - On subsequent attempts, informs the user of an invalid selection if needed.
+      - If the user's input matches a key in the `datasets` dictionary, it prints the selected dataset.
+      
+      Returns:
+      None
+    """
+    global attempted, dataset
+    print("Invalid selection. Try again. \n") if attempted > 0 else print("Select a dataset: \n")
+    attempted += 1
+    dataset = input(" 1. Amazon \n 2. Best Buy \n 3. K-mart \n 4. Nike \n 5. Custom \n 6. Generic \n")
+    if dataset in datasets.keys(): print("You selected: ", datasets[dataset])
+
 
 input_read_condition = lambda: dataset not in datasets.keys()
 do_while(input_read_condition, read_dataset_input)
@@ -44,23 +54,44 @@ do_while(input_read_condition, read_dataset_input)
 support = None
 confidence = None
 
+
 def read_threshold():
-  global support, confidence
-  support = input("Enter support threshold: ")
-  confidence = input("Enter confidence threshold: ")
+    """
+    - Prompts the user to enter a value for the support threshold.
+    - Prompts the user to enter a value for the confidence threshold.
+
+    Returns:
+    None
+    """
+    global support, confidence
+    support = input("Enter support threshold: ")
+    confidence = input("Enter confidence threshold: ")
+
 
 def threshold_read_condition():
-  global support, confidence
-  try:
-    support = float(support)
-    confidence = float(confidence)
-  except ValueError:
-    print("Invalid input type. Try again.")
+    """
+    - Attempts to convert `support` and `confidence` to floats.
+    - If conversion fails (i.e., invalid input types), prints an error message and returns True to
+      indicate the need for retrying.
+    - Checks whether the values for `support` and `confidence` fall within the valid range [0, 1].
+    - Returns False if both values are valid, otherwise returns True and prints an error message.
+
+    Returns:
+    bool: True if input is invalid (either due to type or out-of-range values), False otherwise.
+    """
+    global support, confidence
+    try:
+      support = float(support)
+      confidence = float(confidence)
+    except ValueError:
+      print("Invalid input type. Try again.")
+      return True
+    if 0 <= support <= 1 and 0 <= confidence <= 1:
+      return False
+    print("Invalid input range. Try again.")
     return True
-  if 0 <= support <= 1 and 0 <= confidence <= 1:
-    return False
-  print("Invalid input range. Try again.")
-  return True
+
+
 do_while(threshold_read_condition, read_threshold)
 
 print("Generating association rules for ", datasets[dataset], " dataset with support: ", support, " and confidence: ", confidence)
@@ -130,23 +161,55 @@ freq_itemset_support = {}
 
 
 def count_item_freq(itemsets):
-  itemset_support = {}
-  for transaction in transactions_list:
-    for itemset in itemsets:
-      for item in itemset:
-        if item not in transaction:
-          break
-      else:
-        itemset_support[itemset] = itemset_support.get(itemset, 0) + 1
-  return itemset_support
+    """
+    - Iterates over each transaction in `transactions_list` and checks whether each itemset
+      is present in the transaction.
+    - If all items in an itemset are found within a transaction, increments the count for that
+      itemset in the `itemset_support` dictionary.
+    - Uses the `itemset_support` dictionary to store the frequency of each itemset.
+
+    Returns:
+    dict: A dictionary where the keys are itemsets and the values are their corresponding frequencies.
+    """
+    itemset_support = {}
+    for transaction in transactions_list:
+      for itemset in itemsets:
+        for item in itemset:
+          if item not in transaction:
+            break
+        else:
+          itemset_support[itemset] = itemset_support.get(itemset, 0) + 1
+    return itemset_support
 
 
 def prune_items(last_freq_itemset):
-  return {itemset:(sup/len(transactions_list)) for itemset,sup in last_freq_itemset.items() if sup >= min_sup}
+    """
+    - Iterates over each itemset and its support in `last_freq_itemset`.
+    - Filters out itemsets whose support is below `min_sup`.
+    - For each retained itemset, calculates its relative support as the ratio of its count to the
+      total number of transactions.
+
+    Returns:
+    dict: A dictionary where the keys are itemsets and the values are their relative support
+          (calculated as support count divided by the total number of transactions), for itemsets
+          that meet or exceed the minimum support threshold.
+    """
+    return {itemset:(sup/len(transactions_list)) for itemset,sup in last_freq_itemset.items() if sup >= min_sup}
+
 
 def make_n_itemset(n_itemset):
-  n = len(n_itemset[0])
-  return list(combinations(list(set(item for s in n_itemset for item in s)), n + 1))
+    """
+    - Extracts unique items from the provided `n_itemset`.
+      - Creates (n+1)-itemsets by combining these unique items.
+      - Returns a list of all possible (n+1)-itemsets.
+
+      Example:
+      If `n_itemset` contains itemsets like [('A', 'B'), ('A', 'C')], the function will generate
+      (n+1)-itemsets like [('A', 'B', 'C')] if 'A', 'B', 'C' are the unique items.
+    """
+    n = len(n_itemset[0])
+    return list(combinations(list(set(item for s in n_itemset for item in s)), n + 1))
+
 
 start_time = time.time()
 
