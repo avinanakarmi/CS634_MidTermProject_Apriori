@@ -37,23 +37,41 @@ This Jupyter notebook demonstrates the implementation and comparison of associat
      - Print the rules and their metrics.
 
 7. **Implementing Apriori Algorithm Manually**
-   - **Description**: Manually implements the Apriori algorithm to generate frequent itemsets and calculates their support.
-   - **Functions**:
-     - `count_item_freq(itemsets)`
-     - `prune_items(last_freq_itemset)`
-     - `make_n_itemset(n_itemset)`
+   - **Description**: Manually implements the Apriori algorithm to generate frequent itemsets and calculate their support. This implementation also mines association rules based on confidence thresholds.
+   - **Functions:**
+     - **`count_item_freq(itemsets)`**:
+       - Iterates over transactions to check the presence of itemsets and counts their frequency.
+       - **Returns**: A dictionary where keys are itemsets and values are their frequencies.
+     - **`prune_items(last_freq_itemset)`**:
+       - Filters out itemsets with support below the minimum threshold (`min_sup`).
+       - **Returns**: A dictionary of itemsets with their relative support (support count divided by total transactions).
+     - **`make_n_itemset(n_itemset)`**:
+       - Generates (n+1)-itemsets by combining unique items from the provided `n_itemset`.
+         - **Returns**: A list of all possible (n+1)-itemsets.
+   - **Algorithm Flow**:
+     1. **Generating Frequent Itemsets**:
+        - The algorithm starts by generating individual itemsets from the transactions.
+        - It then iterates to generate higher-level itemsets (n+1) using the functions provided:
+          - **`count_item_freq`** counts itemset frequencies.
+          - **`prune_items`** filters out infrequent itemsets.
+          - **`make_n_itemset`** creates the next level of itemsets.
+        - This loop continues until no more frequent itemsets can be generated.
+     2. **Mining Association Rules**:
+        - The frequent itemsets are used to generate association rules.
+        - For each itemset with 2 or more items, it computes the confidence of the rule:
+          - **Confidence** is calculated as the ratio of the frequency of the full itemset to the frequency of the antecedent.
+          - If the confidence exceeds the specified threshold, the rule is retained.
 
 ## Requirements
 
 - `pandas`
 - `mlxtend` (for Apriori and FP-Growth algorithms)
-- `numpy`
-- `scikit-learn`
+- `itertools`
 
 To install the necessary packages, you can use the following commands:
 
 ```bash
-pip install pandas mlxtend numpy scikit-learn
+pip install pandas mlxtend itertools
 ```
 
 ## Usage
@@ -80,9 +98,27 @@ pip install pandas mlxtend numpy scikit-learn
 For example, after running the notebook, you might see results like:
 
 ```
-Antecedents      Consequents   Support  Confidence
-0             (pen)         (cheese)  0.666667        1.00
-1          (cheese)            (pen)  0.666667        0.80
+Rule  1 :  ('Bed Skirts',) -> ('Kids Bedding',)
+Confidence:  90.9090909090909 %
+Support:  50.0 %
+
+
+Rule  2 :  ('Kids Bedding',) -> ('Bed Skirts',)
+Confidence:  83.33333333333334 %
+Support:  50.0 %
+
+
+Rule  3 :  ('Kids Bedding',) -> ('Sheets',)
+Confidence:  83.33333333333334 %
+Support:  50.0 %
+
+
+Rule  4 :  ('Sheets',) -> ('Kids Bedding',)
+Confidence:  100.0 %
+Support:  50.0 %
+
+
+Time taken:  0.004616975784301758  seconds
 ...
 ```
 
