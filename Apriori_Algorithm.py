@@ -17,14 +17,15 @@ def do_while(check_condition, action):
 
 """# Data Selection"""
 
-datasets = {
-  '1': 'Amazon',
-  '2': 'Best Buy',
-  '3': 'K-Mart',
-  '4': 'Nike',
-  '5': 'Custom',
-  '6': 'Generic',
-}
+### Listing all datasets stored in the ./datasets folder
+
+from os import listdir
+from os.path import isfile, join
+
+path = './datasets/'
+
+datasets = [f.split('.')[0] for f in listdir(path) if isfile(join(path, f)) and f.split('.')[1] == 'csv']
+datasets = dict(zip(range(1, len(datasets) + 1), datasets))
 
 
 dataset = 0
@@ -42,8 +43,10 @@ def read_dataset_input():
     """
     global attempted, dataset
     print("Invalid selection. Try again. \n") if attempted > 0 else print("Select a dataset: \n")
+    for k,v in datasets.items():
+      print(k, ': ', v)
     attempted += 1
-    dataset = input(" 1. Amazon \n 2. Best Buy \n 3. K-mart \n 4. Nike \n 5. Custom \n 6. Generic \n")
+    dataset = int(input())
     if dataset in datasets.keys(): print("You selected: ", datasets[dataset])
 
 
