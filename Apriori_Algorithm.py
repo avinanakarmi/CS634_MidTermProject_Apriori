@@ -65,8 +65,8 @@ def read_threshold():
     None
     """
     global support, confidence
-    support = input("Enter support threshold: ")
-    confidence = input("Enter confidence threshold: ")
+    support = input("Enter support threshold between 0.1 to 100 : ")
+    confidence = input("Enter confidence threshold between 0.1 to 100 : ")
 
 
 def threshold_read_condition():
@@ -87,7 +87,7 @@ def threshold_read_condition():
     except ValueError:
       print("Invalid input type. Try again.")
       return True
-    if 0 <= support <= 1 and 0 <= confidence <= 1:
+    if 0 < support <= 1 and 0 < confidence <= 1:
       return False
     print("Invalid input range. Try again.")
     return True
