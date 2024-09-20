@@ -68,8 +68,8 @@ def read_threshold():
     None
     """
     global support, confidence
-    support = input("Enter support threshold between 0.1 to 100 : ")
-    confidence = input("Enter confidence threshold between 0.1 to 100 : ")
+    support = input("Enter support threshold between 0.1 to 1 : ")
+    confidence = input("Enter confidence threshold between 0.1 to 1 : ")
 
 
 def threshold_read_condition():
